@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Amazon S3</title>
+</head>
+
+<body>
+  <div>
+    <form action="" onsubmit="registerUser(event)">
+      <div>
+        <h2>Register User</h2>
+      </div>
+      <div>
+        <label>Username:</label>
+        <input type="text" name="username" id="r_username" />
+      </div>
+      <div>
+        <label>Password:</label>
+        <input type="password" name="password" id="r_password" />
+      </div>
+      <div>
+        <label>Email Id:</label>
+        <input type="email" name="email_id" id="r_email_id" />
+      </div>
+      <div>
+        <label>Phone Number:</label>
+        <input type="text" name="password" id="r_phone_number" />
+      </div>
+      <div>
+        <input type="reset" value="Clear" />
+        <input type="submit" value="Sign Up" />
+      </div>
+      <a href="login.html">Login</a>
+    </form>
+
+    <script src="js/aws-cognito-sdk.min.js"></script>
+    <script src="js/amazon-cognito-identity.min.js"></script>
+    <script type="text/javascript">
+      function registerUser(event) {
+        event.preventDefault();
+
+        var username = document.getElementById("r_username").value;
+        var password = document.getElementById("r_password").value;
+        var email_id = document.getElementById("r_email_id").value;
+        var phone_number = document.getElementById("r_phone_number").value;
+
+        var config = {
+          UserPoolId: "us-east-2_mhv9WHdzT",
+          ClientId: "qs26sgd93jkhp4uo1f8drhb9u",
+          region: "us-east-2",
+          IdentityPoolId: "us-east-2:ac081843-e3df-4726-9351-fbb91dec093b",
+          BucketName: "gsdemo",
+          accessKeyId: "AKIAJV56KHU7CUOZ35QA",
+          secretAccessKey: "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"
+        };
+
+        var poolData = {
+          UserPoolId: config.UserPoolId,
+          ClientId: config.ClientId
+        };
+
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+        var attributeList = [];
+
+        var dataEmail = {
+          Name: "email",
+          Value: email_id
+        };
+
+        var dataPhoneNumber = {
+          Name: "phone_number",
+          Value: phone_number
+        };
+
+        var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(
+          dataEmail
+        );
+
+        var attributePhoneNumber = new AmazonCognitoIdentity.CognitoUserAttribute(
+          dataPhoneNumber
+        );
+
+        attributeList.push(attributeEmail);
+        attributeList.push(attributePhoneNumber);
+
+        userPool.signUp(username, password, attributeList, null, function (
+          err,
+          result
+        ) {
+          if (err) {
+            alert(err.message || JSON.stringify(err));
+            return;
+          }
+          var cognitoUser = result.user;
+          alert(
+            cognitoUser.getUsername() + " user is registered successfully."
+          );
+        });
+      }
+    </script>
+</body>
+
+</html>

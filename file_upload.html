@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Amazon S3</title>
+  </head>
+  <body>
+    <div>
+      <div>
+        <label>File: </label>
+        <input type="file" name="file_upload" id="image-file" />
+        <input type="submit" value="Upload File" onclick="fileUpload(event)" />
+      </div>
+      <div>
+        <a
+          href="https://d7vqv48djg.execute-api.us-east-2.amazonaws.com/gsdemoapi"
+          >Show Dynomo DB</a
+        >
+      </div>
+      <div id="stored_image"></div>
+    </div>
+
+    <script src="js/aws-cognito-sdk.min.js"></script>
+    <script src="js/amazon-cognito-identity.min.js"></script>
+    <script src="js/aws-sdk-2.481.0.min.js"></script>
+    <script type="text/javascript">
+      function fileUpload() {
+        event.preventDefault;
+        let photo = document.getElementById("image-file").files[0];
+
+        var config = {
+          UserPoolId: "us-east-2_mhv9WHdzT",
+          ClientId: "qs26sgd93jkhp4uo1f8drhb9u",
+          region: "us-east-2",
+          IdentityPoolId: "us-east-2:ac081843-e3df-4726-9351-fbb91dec093b",
+          BucketName: "gsdemo",
+          accessKeyId: "AKIAJV56KHU7CUOZ35QA",
+          secretAccessKey: "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"
+        };
+
+        AWS.config.region = config.region;
+
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: config.IdentityPoolId
+        });
+
+        AWS.config.credentials.get(function(err) {
+          if (err) alert(err);
+          console.log(AWS.config.credentials);
+        });
+
+        let s3Bucket = new AWS.S3({
+          accessKeyId: config.accessKeyId,
+          secretAccessKey: config.secretAccessKey,
+          Bucket: config.BucketName
+        });
+
+        var params = {
+          Bucket: config.BucketName,
+          Key: "data/" + photo.name,
+          ContentType: photo.type,
+          Body: photo,
+          ACL: "public-read"
+        };
+        s3Bucket.putObject(params, function(err, data) {
+          if (err) {
+            alert("error in callback");
+            console.log(err);
+          }
+
+          var stored_image = document.getElementById("stored_image");
+          var image = document.createElement("img");
+          image.setAttribute(
+            "src",
+            "https://" +
+              config.BucketName +
+              ".s3." +
+              config.region +
+              ".amazonaws.com/" +
+              params.Key
+          );
+          image.setAttribute("alt", "image");
+          stored_image.appendChild(image);
+        });
+      }
+    </script>
+  </body>
+</html>
