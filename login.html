@@ -53,8 +53,8 @@
           region: "us-east-2",
           IdentityPoolId: "us-east-2:ac081843-e3df-4726-9351-fbb91dec093b",
           BucketName: "gsdemo",
-          accessKeyId: "AKIAJV56KHU7CUOZ35QA",
-          secretAccessKey: "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"
+          accessKeyId: "AKIAIL6D2LW5ELGBLZSQ",
+          secretAccessKey: "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"
         };
 
         var poolData = {
@@ -70,6 +70,7 @@
         };
 
         var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
         cognitoUser.authenticateUser(authenticationDetails, {
           onSuccess: function(result) {
             var accessToken = result.getAccessToken().getJwtToken();
